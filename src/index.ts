@@ -41,31 +41,53 @@ app.post('/chat-to-document', async (c) => {
 
 	const { documentData, question } = await c.req.json();
 
-	const chatCompletion = await openai.chat.completions.create({
-		messages: [
-			{
-				role: 'system',
-				content:
-					`
-						You are an assistant helping a user to chat with a document, I am roviding a JSON file of the markdown for the document. Using this, answer the user's question
-						in the clearest way possible. The document is about 					
-					` + documentData,
-			},
-			{
-				role: 'user',
-				content: `My question is: ` + question,
-			},
-		],
-		model: 'gpt-5-nano',
-		temperature: 0.5,
-	});
+	if (!documentData || !question) {
+		return c.json({ message: 'Missing documentData or question.' }, 400);
+	}
 
-	const res = chatCompletion.choices[0].message.content;
+	try {
+		const chatCompletion = await openai.chat.completions.create({
+			model: 'gpt-5-nano',
+			// No `temperature`: gpt-5 models reject any value other than the
+			// default of 1 with a 400.
+			messages: [
+				{
+					role: 'system',
+					content: [
+						'You are an assistant helping a user chat with a document.',
+						'The document is provided below as markdown.',
+						"Answer the user's question as clearly as possible using only that document.",
+						'If the answer is not in the document, say so rather than guessing.',
+						'',
+						'--- DOCUMENT ---',
+						documentData,
+					].join('\n'),
+				},
+				{
+					role: 'user',
+					content: `My question is: ${question}`,
+				},
+			],
+		});
 
-	return c.json({
-		message: res,
-	});
+		const message = chatCompletion.choices[0]?.message?.content?.trim();
+
+		// content is typed `string | null`, and reasoning models can burn their
+		// whole budget on internal reasoning and return nothing.
+		if (!message) {
+			return c.json({
+				message: 'The model did not return an answer. Try rephrasing your question.',
+			});
+		}
+
+		return c.json({ message });
+	} catch (error) {
+		console.error('chat-to-document failed:', error);
+
+		return c.json({ message: error instanceof Error ? error.message : 'Unknown error calling OpenAI.' }, 500);
+	}
 });
+
 
 app.post('/translate-document-summary', async (c) => {
 	const { documentData, targetLanguage } = await c.req.json();
