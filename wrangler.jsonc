@@ -8,12 +8,10 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2026-08-06",
 	"observability": {
-		"enabled": true
+		"enabled": true,
 	},
 	"upload_source_maps": true,
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
+	"compatibility_flags": ["nodejs_compat"],
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -26,16 +24,16 @@
 	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
 	"ai": {
-		"binding": "AI"
+		"binding": "AI",
 	},
-"previews": {
-    "vars": {
-      "ENVIRONMENT": "preview"
-    },
-},
-"vars": {
-    "ENVIRONMENT": "production"
-  }
+	"previews": {
+		"vars": {
+			"ENVIRONMENT": "preview",
+		},
+	},
+	"vars": {
+		"ENVIRONMENT": "production",
+	},
 	/**
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
