@@ -27,7 +27,15 @@
 	 */
 	"ai": {
 		"binding": "AI"
-	}
+	},
+"previews": {
+    "vars": {
+      "ENVIRONMENT": "preview"
+    },
+},
+"vars": {
+    "ENVIRONMENT": "production"
+  }
 	/**
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
